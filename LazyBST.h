@@ -67,29 +67,28 @@ void LazyBST<T>::printTree(ostream& out) {
 template <class T>
 void LazyBST<T>::recPrint(LazyTreeNode<T> *node, ostream& out) const {
     if (node == nullptr) {
-        out << "Null" << endl;
         return;
     }
     // preorder traversal
-    cout << node->key << endl;
+    out << node->key << endl;
     recPrint(node->left, out);
     recPrint(node->right, out);
 }
 
 template <class T>
 bool LazyBST<T>::get(const T& value, T& output) {
-    LazyTreeNode<T>* node = root;
-    while (node != nullptr) {
-        if (value == node->key) {
-            output = node->key;
+    LazyTreeNode<T>* current = root;
+    while (current != nullptr) {
+        if (value == current->key) {
+            output = current->key;
             return true;
-        } else if (value < node->key) {
-            node = node->left;
+        } else if (value < current->key) {
+            current = current->left;
         } else {
-            node = node->right;
+            current = current->right;
         }
     }
-    return false; // Return false if not found
+    return false;
 }
 
 
@@ -299,6 +298,8 @@ void LazyBST<T>::recPrint(LazyTreeNode<T> *node) const {
     recPrint(node->left);
     recPrint(node->right);
 }
+
+
 
 template <class T>
 void LazyBST<T>::clearTree(LazyTreeNode<T> *node) {

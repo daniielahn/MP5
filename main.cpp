@@ -76,9 +76,11 @@ void findStudent() {
     cout << "Enter student ID: ";
     cin >> id;
     Student student(id);
-    if (studentTable.contains(student)) {
+    Student foundStudent;
+
+    if (studentTable.get(student, foundStudent)) {
         cout << "Student found:" << endl;
-        cout << student << endl;
+        cout << foundStudent << endl;
     } else {
         cout << "Student not found." << endl;
     }
@@ -89,9 +91,11 @@ void findFaculty() {
     cout << "Enter faculty ID: ";
     cin >> id;
     Faculty faculty(id);
-    if (facultyTable.contains(faculty)) {
+    Faculty foundFaculty;
+
+    if (facultyTable.get(faculty, foundFaculty)) {
         cout << "Faculty found:" << endl;
-        cout << faculty << endl;
+        cout << foundFaculty << endl;
     } else {
         cout << "Faculty not found." << endl;
     }
@@ -101,7 +105,24 @@ void addStudent() {
     Student student;
     cout << "Enter student details (ID, Name, Level, Major, GPA, Advisor ID):" << endl;
     cin >> student;
-    studentTable.insert(student);
+
+    // Check if the advisor ID exists in the faculty table
+    Faculty advisor(student.getAdvisor());
+    Faculty foundAdvisor;
+
+    if (facultyTable.get(advisor, foundAdvisor)) {
+        // Add student to the tree
+        studentTable.insert(student);
+
+        // Add student ID as an advisee to the faculty member
+        foundAdvisor.addAdvisee(student.getId());
+        facultyTable.deleteNode(advisor);
+        facultyTable.insert(foundAdvisor);
+
+        cout << "Student added successfully." << endl;
+    } else {
+        cout << "Error: Advisor ID does not exist." << endl;
+    }
 }
 
 void deleteStudent() {
@@ -109,14 +130,42 @@ void deleteStudent() {
     cout << "Enter student ID to delete: ";
     cin >> id;
     Student student(id);
-    studentTable.deleteNode(student);
+    Student foundStudent;
+
+    if (studentTable.get(student, foundStudent)) {
+        int advisorId = foundStudent.getAdvisor();
+        Faculty advisor(advisorId);
+        Faculty foundAdvisor;
+
+        // Remove student from advisor's list of advisees if advisor exists
+        if (facultyTable.get(advisor, foundAdvisor)) {
+            foundAdvisor.removeAdvisee(id);
+            facultyTable.deleteNode(advisor);
+            facultyTable.insert(foundAdvisor);
+        }
+
+        // Delete the student
+        studentTable.deleteNode(student);
+        cout << "Student deleted successfully." << endl;
+    } else {
+        cout << "Student not found." << endl;
+    }
 }
+
 
 void addFaculty() {
     Faculty faculty;
     cout << "Enter faculty details (ID, Name, Level, Department, Number of Advisees, Advisees):" << endl;
     cin >> faculty;
+
+    // Check if the ID exists in the student table
+    if (facultyTable.contains(Faculty(faculty.getId()))) {
+        cout << "Error: ID already exists for a faculty member." << endl;
+        return;
+    }
+
     facultyTable.insert(faculty);
+    cout << "Faculty member added successfully." << endl;
 }
 
 void deleteFaculty() {
@@ -124,8 +173,49 @@ void deleteFaculty() {
     cout << "Enter faculty ID to delete: ";
     cin >> id;
     Faculty faculty(id);
-    facultyTable.deleteNode(faculty);
+    Faculty foundFaculty;
+
+    if (facultyTable.get(faculty, foundFaculty)) {
+        if (foundFaculty.getAdviseeCount() > 0) {
+            int newAdvisorId;
+            cout << "Faculty has advisees. Enter new advisor ID for these students: ";
+            cin >> newAdvisorId;
+            Faculty newAdvisor(newAdvisorId);
+            Faculty foundNewAdvisor;
+
+            if (!facultyTable.get(newAdvisor, foundNewAdvisor)) {
+                cout << "New advisor ID not found." << endl;
+                return;
+            }
+
+            // Reassign advisees
+            for (int i = 0; i < foundFaculty.getAdviseeCount(); ++i) {
+                int adviseeId = foundFaculty.getAdvisees()[i];
+                Student student(adviseeId);
+                Student foundStudent;
+
+                if (studentTable.get(student, foundStudent)) {
+                    foundStudent.setAdvisor(newAdvisorId);
+                    studentTable.deleteNode(student);
+                    studentTable.insert(foundStudent);
+                    foundNewAdvisor.addAdvisee(adviseeId);
+                }
+            }
+
+            // Update new advisor in the tree
+            facultyTable.deleteNode(newAdvisor);
+            facultyTable.insert(foundNewAdvisor);
+        }
+
+        // Delete the old faculty member
+        facultyTable.deleteNode(faculty);
+        cout << "Faculty member deleted successfully." << endl;
+    } else {
+        cout << "Faculty not found." << endl;
+    }
 }
+
+
 
 void changeAdvisor() {
     int studentId, newAdvisorId;
@@ -134,18 +224,30 @@ void changeAdvisor() {
     cout << "Enter new advisor ID: ";
     cin >> newAdvisorId;
 
-    Student student(studentId), foundStudent;
-    Faculty newAdvisor(newAdvisorId), foundFaculty;
+    Student student(studentId);
+    Faculty newAdvisor(newAdvisorId);
+    Student foundStudent;
+    Faculty foundNewAdvisor, foundOldAdvisor;
 
-    if (studentTable.get(student, foundStudent) && facultyTable.get(newAdvisor, foundFaculty)) {
+    if (studentTable.get(student, foundStudent) && facultyTable.get(newAdvisor, foundNewAdvisor)) {
+        int oldAdvisorId = foundStudent.getAdvisor();
+        if (facultyTable.get(Faculty(oldAdvisorId), foundOldAdvisor)) {
+            foundOldAdvisor.removeAdvisee(studentId);
+            facultyTable.deleteNode(foundOldAdvisor);
+            facultyTable.insert(foundOldAdvisor);
+        }
         foundStudent.setAdvisor(newAdvisorId);
-        studentTable.deleteNode(foundStudent);
+        foundNewAdvisor.addAdvisee(studentId);
+        studentTable.deleteNode(student);
         studentTable.insert(foundStudent);
+        facultyTable.deleteNode(newAdvisor);
+        facultyTable.insert(foundNewAdvisor);
         cout << "Advisor changed successfully." << endl;
     } else {
         cout << "Invalid student ID or advisor ID." << endl;
     }
 }
+
 
 void removeAdvisee() {
     int facultyId, adviseeId;
@@ -154,13 +256,21 @@ void removeAdvisee() {
     cout << "Enter advisee ID: ";
     cin >> adviseeId;
 
-    Faculty faculty(facultyId), foundFaculty;
-    Student advisee(adviseeId), foundAdvisee;
+    Faculty faculty(facultyId);
+    Faculty foundFaculty;
+    Student advisee(adviseeId);
+    Student foundAdvisee;
 
     if (facultyTable.get(faculty, foundFaculty) && studentTable.get(advisee, foundAdvisee)) {
         foundFaculty.removeAdvisee(adviseeId);
-        facultyTable.deleteNode(foundFaculty);
+        studentTable.deleteNode(advisee);
+        foundAdvisee.setAdvisor(-1); // Or 0, depending on your convention
+        studentTable.insert(foundAdvisee);
+
+        // Update faculty table
+        facultyTable.deleteNode(faculty);
         facultyTable.insert(foundFaculty);
+
         cout << "Advisee removed successfully." << endl;
     } else {
         cout << "Invalid faculty ID or advisee ID." << endl;
@@ -168,12 +278,20 @@ void removeAdvisee() {
 }
 
 
+
+
 void exitProgram() {
     ofstream outFile("runLog.txt");
+
+    // Log students
     outFile << "Students:" << endl;
     studentTable.printTree(outFile);
+
+    // Log faculty
     outFile << "Faculty:" << endl;
     facultyTable.printTree(outFile);
+
     outFile.close();
     cout << "Program terminated. Data saved to runLog.txt" << endl;
 }
+

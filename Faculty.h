@@ -82,10 +82,11 @@ public:
     void setDepartment(string newDepartment) { department = newDepartment; }
 
     void addAdvisee(int adviseeID) {
+        // Ensure capacity
         if (adviseeCount == adviseeCapacity) {
             int newCapacity = adviseeCapacity * 2;
-            int *newAdvisees = new int[newCapacity];
-            copy(advisees, advisees + adviseeCount, newAdvisees);
+            int* newAdvisees = new int[newCapacity];
+            std::copy(advisees, advisees + adviseeCount, newAdvisees);
             delete[] advisees;
             advisees = newAdvisees;
             adviseeCapacity = newCapacity;
@@ -94,21 +95,21 @@ public:
     }
 
     void removeAdvisee(int adviseeID) {
-        int index = -1;
+        // Find and remove the advisee
         for (int i = 0; i < adviseeCount; ++i) {
             if (advisees[i] == adviseeID) {
-                index = i;
+                // Shift elements to the left to fill the gap
+                for (int j = i; j < adviseeCount - 1; ++j) {
+                    advisees[j] = advisees[j + 1];
+                }
+                --adviseeCount;
                 break;
             }
         }
-
-        if (index != -1) {
-            for (int i = index; i < adviseeCount - 1; ++i) {
-                advisees[i] = advisees[i + 1];
-            }
-            --adviseeCount;
-        }
     }
+
+
+
 
     // Input/Output Operators
     friend ostream &operator<<(ostream &out, const Faculty &faculty) {

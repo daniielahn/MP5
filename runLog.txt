@@ -1,4 +1,4 @@
 Students:
-Null
+ID: 1, Name: dan, Level: s, Major: sswe, GPA: 4, Advisor ID: 1001
 Faculty:
-Null
+ID: 1001, Name: dan, Level: s, Department: s, Advisees: [1]
