@@ -11,6 +11,7 @@ using namespace std;
 LazyBST<Student> studentTable;
 LazyBST<Faculty> facultyTable;
 
+// Function declarations
 void printAllStudents();
 void printAllFaculty();
 void findStudent();
@@ -43,6 +44,7 @@ int main() {
         cout << "Enter your choice: ";
         cin >> choice;
 
+        // Switch statement to handle user choices
         switch (choice) {
             case 1: printAllStudents(); break;
             case 2: printAllFaculty(); break;
@@ -61,16 +63,19 @@ int main() {
     return 0;
 }
 
+// Function to print all students
 void printAllStudents() {
     cout << "Student Information:" << endl;
     studentTable.printTree();
 }
 
+// Function to print all faculty
 void printAllFaculty() {
     cout << "Faculty Information:" << endl;
     facultyTable.printTree();
 }
 
+// Function to find a student by ID
 void findStudent() {
     int id;
     cout << "Enter student ID: ";
@@ -86,6 +91,7 @@ void findStudent() {
     }
 }
 
+// Function to find a faculty by ID
 void findFaculty() {
     int id;
     cout << "Enter faculty ID: ";
@@ -101,6 +107,7 @@ void findFaculty() {
     }
 }
 
+// Function to add a new student
 void addStudent() {
     Student student;
     cout << "Enter student details (ID, Name, Level, Major, GPA, Advisor ID):" << endl;
@@ -125,6 +132,7 @@ void addStudent() {
     }
 }
 
+// Function to delete a student
 void deleteStudent() {
     int id;
     cout << "Enter student ID to delete: ";
@@ -152,7 +160,7 @@ void deleteStudent() {
     }
 }
 
-
+// Function to add a new faculty member
 void addFaculty() {
     Faculty faculty;
     cout << "Enter faculty details (ID, Name, Level, Department, Number of Advisees, Advisees):" << endl;
@@ -168,6 +176,7 @@ void addFaculty() {
     cout << "Faculty member added successfully." << endl;
 }
 
+// Function to delete a faculty member
 void deleteFaculty() {
     int id;
     cout << "Enter faculty ID to delete: ";
@@ -215,8 +224,7 @@ void deleteFaculty() {
     }
 }
 
-
-
+// Function to change a student's advisor
 void changeAdvisor() {
     int studentId, newAdvisorId;
     cout << "Enter student ID: ";
@@ -248,7 +256,7 @@ void changeAdvisor() {
     }
 }
 
-
+// Function to remove an advisee from a faculty member
 void removeAdvisee() {
     int facultyId, adviseeId;
     cout << "Enter faculty ID: ";
@@ -277,9 +285,7 @@ void removeAdvisee() {
     }
 }
 
-
-
-
+// Function to exit the program and save data to a file
 void exitProgram() {
     ofstream outFile("runLog.txt");
 
@@ -294,4 +300,3 @@ void exitProgram() {
     outFile.close();
     cout << "Program terminated. Data saved to runLog.txt" << endl;
 }
-

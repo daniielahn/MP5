@@ -2,52 +2,94 @@
 #define LAZYBST_H
 
 #include <iostream>
-#include <cmath>
+#include <cmath> // For mathematical functions
 using namespace std;
 
 template <class T>
 class LazyTreeNode {
-    public:
-        T key;
-        LazyTreeNode *left, *right;
-        int leftDepth, rightDepth;
+public:
+    T key;
+    LazyTreeNode *left, *right;
+    int leftDepth, rightDepth; // Depth of left and right subtrees
 
-        LazyTreeNode(T k) : key(k), left(nullptr), right(nullptr), leftDepth(0), rightDepth(0) {}
-        ~LazyTreeNode() {}
+    LazyTreeNode(T k) : key(k), left(nullptr), right(nullptr), leftDepth(0), rightDepth(0) {}
+    ~LazyTreeNode() {}
 };
 
 template <class T>
 class LazyBST {
-    public:
-        LazyBST() : root(nullptr) {}
-        ~LazyBST() {
-            clearTree(root);
-        }
+public:
+    LazyBST() : root(nullptr) {}
+    ~LazyBST() {
+        clearTree(root); // Deallocate memory
+    }
 
-        void insert(T value);
-        bool contains(T value);
-        bool deleteNode(T k);
-        T* getMin();
-        T* getMax();
-        bool get(const T& value, T& output);
-        bool isEmpty() { return root == nullptr; }
-        void printTree();
-        void printTree(ostream& out);
+    // Public Interface
 
-    private:
-        LazyTreeNode<T>* root;
+    // Inserts a value into the tree
+    void insert(T value);
 
-        LazyTreeNode<T>* insert(LazyTreeNode<T> *node, T value, bool &isImbalanced);
-        LazyTreeNode<T>* deleteNode(LazyTreeNode<T> *node, T k, bool &isImbalanced, bool &deleted);
-        LazyTreeNode<T>* getSuccessor(LazyTreeNode<T> *d);
-        void updateDepths(LazyTreeNode<T> *node);
-        void checkAndBalance();
-        int collectSize(LazyTreeNode<T> *node);
-        LazyTreeNode<T>* buildBalancedTree(T *sortedValues, int start, int end);
-        int collectValues(LazyTreeNode<T> *node, T *values, int index);
-        void recPrint(LazyTreeNode<T> *node) const;
-        void recPrint(LazyTreeNode<T> *node, ostream& out) const; 
-        void clearTree(LazyTreeNode<T> *node);
+    // Checks if the tree contains a value
+    bool contains(T value);
+
+    // Deletes a node with given key
+    bool deleteNode(T k);
+
+    // Returns a pointer to the minimum value in the tree
+    T* getMin();
+
+    // Returns a pointer to the maximum value in the tree
+    T* getMax();
+
+    // Retrieves the value associated with the given key
+    bool get(const T& value, T& output);
+
+    // Checks if the tree is empty
+    bool isEmpty() { return root == nullptr; }
+
+    // Prints the tree
+    void printTree();
+
+    // Prints the tree to a specified ostream
+    void printTree(ostream& out);
+
+private:
+    LazyTreeNode<T>* root;
+
+    // Private Methods
+
+    // Inserts a value into the tree and checks for imbalance
+    LazyTreeNode<T>* insert(LazyTreeNode<T> *node, T value, bool &isImbalanced);
+
+    // Deletes a node with the given key and checks for imbalance
+    LazyTreeNode<T>* deleteNode(LazyTreeNode<T> *node, T k, bool &isImbalanced, bool &deleted);
+
+    // Finds the successor of a node during deletion
+    LazyTreeNode<T>* getSuccessor(LazyTreeNode<T> *d);
+
+    // Updates the depths of the left and right subtrees
+    void updateDepths(LazyTreeNode<T> *node);
+
+    // Checks for imbalance and rebalances the tree if necessary
+    void checkAndBalance();
+
+    // Collects the size of the subtree rooted at the given node
+    int collectSize(LazyTreeNode<T> *node);
+
+    // Builds a balanced tree from an array of sorted values
+    LazyTreeNode<T>* buildBalancedTree(T *sortedValues, int start, int end);
+
+    // Collects values from the subtree rooted at the given node into an array
+    int collectValues(LazyTreeNode<T> *node, T *values, int index);
+
+    // Recursive function to print the tree
+    void recPrint(LazyTreeNode<T> *node) const;
+
+    // Recursive function to print the tree to a specified ostream
+    void recPrint(LazyTreeNode<T> *node, ostream& out) const;
+
+    // Clears the tree recursively, deallocating memory
+    void clearTree(LazyTreeNode<T> *node);
 };
 
 template <class T>
@@ -90,8 +132,6 @@ bool LazyBST<T>::get(const T& value, T& output) {
     }
     return false;
 }
-
-
 
 template <class T>
 LazyTreeNode<T>* LazyBST<T>::insert(LazyTreeNode<T> *node, T value, bool &isImbalanced) {
@@ -298,8 +338,6 @@ void LazyBST<T>::recPrint(LazyTreeNode<T> *node) const {
     recPrint(node->left);
     recPrint(node->right);
 }
-
-
 
 template <class T>
 void LazyBST<T>::clearTree(LazyTreeNode<T> *node) {

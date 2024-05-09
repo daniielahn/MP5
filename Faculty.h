@@ -1,8 +1,6 @@
-// File: Faculty.h
-
 #include <iostream>
 #include <string>
-#include <algorithm>
+#include <algorithm> // For copy function
 
 using namespace std;
 
@@ -10,42 +8,42 @@ class Faculty {
 public:
     // Constructors
     Faculty() : id(0), name(""), level(""), department(""), adviseeCount(0), adviseeCapacity(2) {
-        advisees = new int[adviseeCapacity];
+        advisees = new int[adviseeCapacity]; // Allocate memory for initial advisees
     }
     Faculty(int id) : id(id), name(""), level(""), department(""), adviseeCount(0), adviseeCapacity(2) {
-        advisees = new int[adviseeCapacity];
+        advisees = new int[adviseeCapacity]; // Allocate memory for initial advisees
     }
 
     Faculty(int id, string name, string level, string department, int *advisees, int count)
         : id(id), name(name), level(level), department(department), adviseeCount(count), adviseeCapacity(count) {
-        this->advisees = new int[count];
-        copy(advisees, advisees + count, this->advisees);
+        this->advisees = new int[count]; // Allocate memory for given advisees
+        copy(advisees, advisees + count, this->advisees); // Copy advisees
     }
 
     Faculty(const Faculty &other)
         : id(other.id), name(other.name), level(other.level), department(other.department), 
           adviseeCount(other.adviseeCount), adviseeCapacity(other.adviseeCapacity) {
-        advisees = new int[adviseeCapacity];
-        copy(other.advisees, other.advisees + adviseeCount, advisees);
+        advisees = new int[adviseeCapacity]; // Allocate memory for advisees
+        copy(other.advisees, other.advisees + adviseeCount, advisees); // Copy advisees
     }
 
     Faculty &operator=(const Faculty &other) {
         if (this != &other) {
-            delete[] advisees;
+            delete[] advisees; // Free existing memory
             id = other.id;
             name = other.name;
             level = other.level;
             department = other.department;
             adviseeCount = other.adviseeCount;
             adviseeCapacity = other.adviseeCapacity;
-            advisees = new int[adviseeCapacity];
-            copy(other.advisees, other.advisees + adviseeCount, advisees);
+            advisees = new int[adviseeCapacity]; // Allocate memory for advisees
+            copy(other.advisees, other.advisees + adviseeCount, advisees); // Copy advisees
         }
         return *this;
     }
 
     ~Faculty() {
-        delete[] advisees;
+        delete[] advisees; // Free allocated memory
     }
 
     // Overloaded Operators
@@ -86,9 +84,9 @@ public:
         if (adviseeCount == adviseeCapacity) {
             int newCapacity = adviseeCapacity * 2;
             int* newAdvisees = new int[newCapacity];
-            std::copy(advisees, advisees + adviseeCount, newAdvisees);
-            delete[] advisees;
-            advisees = newAdvisees;
+            std::copy(advisees, advisees + adviseeCount, newAdvisees); // Copy existing advisees
+            delete[] advisees; // Free old memory
+            advisees = newAdvisees; // Point to new memory
             adviseeCapacity = newCapacity;
         }
         advisees[adviseeCount++] = adviseeID;
@@ -127,10 +125,10 @@ public:
     }
 
     friend istream &operator>>(istream &in, Faculty &faculty) {
-        delete[] faculty.advisees;
+        delete[] faculty.advisees; // Free existing memory
         faculty.adviseeCount = 0;
         faculty.adviseeCapacity = 2;
-        faculty.advisees = new int[faculty.adviseeCapacity];
+        faculty.advisees = new int[faculty.adviseeCapacity]; // Allocate memory for initial advisees
 
         cout << "Enter ID: ";
         in >> faculty.id;
@@ -148,7 +146,7 @@ public:
             int adviseeID;
             cout << "Enter advisee ID " << i + 1 << ": ";
             in >> adviseeID;
-            faculty.addAdvisee(adviseeID);
+            faculty.addAdvisee(adviseeID); // Add advisee
         }
         return in;
     }
